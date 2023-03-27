@@ -7,7 +7,7 @@ Alumno [Francisco Saucedo](https://www.linkedin.com/in/franciscosaucedo/). \
 
 ## Bitácora actividades
 
-* Copia y registro de librerías
+* Copio y registro librerías cálculo MSU
 
 ```
 LIB_MSU=~/Desarrollo/Soporte/LibreriasMSU;export LIB_MSU
@@ -30,3 +30,5 @@ mvn install:install-file -Dfile=$WEKA_PROJECT_HOME/nbp-jmachinelearning-master.j
     -Dpackaging=jar \
     -DgeneratePom=true
 ```
+
+* Añado librerías cálculo MSU como dependencias en pom.xml Pendiente investigar uso de ANT en Weka.
