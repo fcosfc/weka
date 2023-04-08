@@ -702,12 +702,12 @@ public class RandomTreeMSU extends AbstractClassifier implements OptionHandler,
     result.enable(Capability.NOMINAL_ATTRIBUTES);
     result.enable(Capability.NUMERIC_ATTRIBUTES);
     result.enable(Capability.DATE_ATTRIBUTES);
-    result.enable(Capability.MISSING_VALUES);
+    //result.enable(Capability.MISSING_VALUES);
 
     // class
     result.enable(Capability.NOMINAL_CLASS);
     //result.enable(Capability.NUMERIC_CLASS);
-    result.enable(Capability.MISSING_CLASS_VALUES);
+    //result.enable(Capability.MISSING_CLASS_VALUES);
 
     return result;
   }
