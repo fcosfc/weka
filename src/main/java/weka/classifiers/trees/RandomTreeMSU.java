@@ -14,7 +14,7 @@
  */
 
 /*
- *    RandomTree.java
+ *    RandomTreeMSU.java
  *    Copyright (C) 2001-2012 University of Waikato, Hamilton, New Zealand
  *
  */
@@ -41,10 +41,8 @@ import weka.gui.ProgrammaticProperty;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -139,7 +137,7 @@ public class RandomTreeMSU extends AbstractClassifier implements OptionHandler,
   WeightedInstancesHandler, Randomizable, Drawable, PartitionGenerator {
 
   /** for serialization */
-  private static final long serialVersionUID = -9051119597407396024L;
+  private static final long serialVersionUID = -9051129597407396724L;
 
   /** The Tree object */
   protected Tree m_Tree = null;
@@ -197,7 +195,8 @@ public class RandomTreeMSU extends AbstractClassifier implements OptionHandler,
     return "Class for constructing a tree that considers K randomly "
       + " chosen attributes at each node. Performs no pruning. Also has"
       + " an option to allow estimation of class probabilities (or target mean "
-      + "in the regression case) based on a hold-out set (backfitting).";
+      + "in the regression case) based on a hold-out set (backfitting)."
+      + "It uses a Multivariate Symmetrical Uncertainty (MSU) meassure, instead of information gain.";
   }
 
   /**
@@ -707,7 +706,7 @@ public class RandomTreeMSU extends AbstractClassifier implements OptionHandler,
 
     // class
     result.enable(Capability.NOMINAL_CLASS);
-    result.enable(Capability.NUMERIC_CLASS);
+    //result.enable(Capability.NUMERIC_CLASS);
     result.enable(Capability.MISSING_CLASS_VALUES);
 
     return result;
@@ -853,9 +852,9 @@ public class RandomTreeMSU extends AbstractClassifier implements OptionHandler,
     }
 
     if (m_Tree == null) {
-      return "RandomTree: no model has been built yet.";
+      return "RandomTreeMSU: no model has been built yet.";
     } else {
-      return "\nRandomTree\n==========\n"
+      return "\nRandomTreeMSU\n==========\n"
         + m_Tree.toString(0)
         + "\n"
         + "\nSize of the tree : "
@@ -874,12 +873,12 @@ public class RandomTreeMSU extends AbstractClassifier implements OptionHandler,
   public String graph() throws Exception {
 
     if (m_Tree == null) {
-      throw new Exception("RandomTree: No model built yet.");
+      throw new Exception("RandomTreeMSU: No model built yet.");
     }
     StringBuffer resultBuff = new StringBuffer();
     m_Tree.toGraph(resultBuff, 0, null);
     String result =
-      "digraph RandomTree {\n" + "edge [style=bold]\n" + resultBuff.toString()
+      "digraph RandomTreeMSU {\n" + "edge [style=bold]\n" + resultBuff.toString()
         + "\n}\n";
     return result;
   }
@@ -1242,7 +1241,7 @@ public class RandomTreeMSU extends AbstractClassifier implements OptionHandler,
         return text.toString();
       } catch (Exception e) {
         e.printStackTrace();
-        return "RandomTree: tree can't be printed";
+        return "RandomTreeMSU: tree can't be printed";
       }
     }
 
