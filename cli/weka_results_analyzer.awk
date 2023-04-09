@@ -7,9 +7,10 @@
 
 BEGIN {
   VALIDATION_FLAG = false
+  TREE_SIZE = 0
 }
 
-{
+{  
   if (/Size of the tree :/)
     TREE_SIZE = $6 
     

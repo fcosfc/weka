@@ -58,7 +58,8 @@ import upo.jml.data.dataset.DatasetUtils;
  * <!-- globalinfo-start --> Class for constructing a tree that considers K
  * randomly chosen attributes at each node. Performs no pruning. Also has an
  * option to allow estimation of class probabilities (or target mean in the
- * regression case) based on a hold-out set (backfitting). <br>
+ * regression case) based on a hold-out set (backfitting).
+ * It uses a Multivariate Symmetrical Uncertainty (MSU) meassure, instead of information gain.<br>
  * <br>
  * <!-- globalinfo-end -->
  * 
