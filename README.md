@@ -1,3 +1,4 @@
+
 # Random Forests medición alternativa de la importancia de los atributos
 
 Trabajo Fin de Máster. \
@@ -25,20 +26,24 @@ mvn install:install-file -Dfile=lib/nbp-jmachinelearning-master.jar \
 
 ## Uso
 
-* Compilación
+### Compilación
 
 ```
 mvn clean install -DskipTests=true
 ```
 
-* Utilidad para comparativas entre versiones estándar de RandomForest/RandomTree y las creadas en el TFM que usan MSU
+## Utilidad para comparativas 
 
-** Obtener ayuda
+Permite comparar versiones estándar de Random Forest y Random Tree con las versiones de estudio creadas en el TFM, que utilizan MSU como medida de selección de atributos en la construcción de árboles de decisión.
+La utilidad crea como salida un fichero CSV que contiene las distintas métricas, sus valores para los distintos algoritmos y la comparación de éstos.
+Acciones:
+
+* Obtener ayuda
 ```
 cli/msu.sh
 ```
 
-** Comparativa sobre un conjunto ejemplo de Weka
+* Comparativa sobre un conjunto ejemplo de Weka
 
 ```
 cli/msu.sh weather.nominal
