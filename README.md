@@ -32,7 +32,7 @@ mvn install:install-file -Dfile=lib/nbp-jmachinelearning-master.jar \
 mvn clean install -DskipTests=true
 ```
 
-## Utilidad para comparativas 
+### Utilidad para comparativas 
 
 Permite comparar versiones estándar de Random Forest y Random Tree con las versiones de estudio creadas en el TFM, que utilizan MSU como medida de selección de atributos en la construcción de árboles de decisión.
 La utilidad crea como salida un fichero CSV que contiene las distintas métricas, sus valores para los distintos algoritmos y la comparación de éstos.
@@ -48,3 +48,8 @@ cli/msu.sh
 ```
 cli/msu.sh weather.nominal
 ```
+
+## Referencias
+
+* [A multivariate approach to the symmetrical uncertainty measure: Application to feature selection problem](https://www.sciencedirect.com/science/article/abs/pii/S0020025519303603).
+* [Weka 3: Machine Learning Software in Java](https://www.cs.waikato.ac.nz/ml/weka/index.html).
