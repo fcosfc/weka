@@ -793,17 +793,16 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
       classProbs[0] /= totalWeight;
     }
 
-    // Build tree
-    m_Tree = new Tree();
+    // Build tree        
+    m_Tree = getTree();
     m_Info = new Instances(data, 0);
-    m_Tree.buildTree(train, classProbs, attIndicesWindow, totalWeight, rand, 0,
-      m_MinVarianceProp * trainVariance);
+    buildTree(train, classProbs, attIndicesWindow, totalWeight, rand, trainVariance);
 
     // Backfit if required
     if (backfit != null) {
       m_Tree.backfitData(backfit);
     }
-  }
+  }    
 
   /**
    * Computes class distribution of an instance using the tree.
@@ -960,7 +959,7 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
       return 1;
     }
     return m_Tree.numNodes();
-  }
+  }    
 
   /**
    * The inner class for dealing with the tree.
@@ -2045,6 +2044,15 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
 
       return num;
     }
+  }
+  
+  protected Tree getTree() {
+      return new Tree();
+  }
+
+  protected void buildTree(Instances train, double[] classProbs, int[] attIndicesWindow, double totalWeight, Random rand, double trainVariance) throws Exception {
+    m_Tree.buildTree(train, classProbs, attIndicesWindow, totalWeight, rand, 0,
+                     m_MinVarianceProp * trainVariance);
   }
 
   /**
