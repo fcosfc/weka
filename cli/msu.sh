@@ -10,7 +10,7 @@
 
 WEKA_VERSION=3.8.7-SNAPSHOT.jar
 WEKA_DIST=$PWD/dist/weka-stable-$WEKA_VERSION
-DATASET_DIR=$PWD/resources/sampledatasets
+DATASET_DIR=wekadocs/data
 DATASET_FILE_EXTENSION=arff
 STANDARD_CLASS=weka.classifiers.trees.RandomForest
 MSU_CLASS=weka.classifiers.trees.RandomForestMSU
@@ -18,7 +18,7 @@ CLASS_ARGS="-P 100 -I 100 -num-slots 1 -K 0 -M 1.0 -V 0.001 -S 1"
 SCRIPT_DIR=$PWD/cli
 WORK_DIR=/var/tmp
 LIB_DIR=$PWD/lib/*
-USE="msu.sh\n\tDATASET example weather.nominal\n\tDATASET_DIR default $DATASET_DIR\n\tALGORITHM Tree or Forest, default Tree\n\tWEKA_DIST default $WEKA_DIST\n\tLIB_DIR default $LIB_DIR\n\tSCRIPT_DIR default $SCRIPT_DIR\n\tWORK_DIR default $WORK_DIR\n\n\tExample: cli/msu.sh weather.nominal resources/sampledatasets Tree dist/weka-stable-3.8.7-SNAPSHOT.jar lib cli /var/tmp\n"
+USE="msu.sh\n\tDATASET example weather.nominal\n\tDATASET_DIR ../$DATASET_DIR\n\n\tExample: cli/msu.sh weather.nominal ../$DATASET_DIR\n\n--\n\nmsu.sh\n\tDATASET example weather.nominal\n\tDATASET_DIR ../$DATASET_DIR\n\tALGORITHM Tree or Forest, default Tree\n\tWEKA_DIST default $WEKA_DIST\n\tLIB_DIR default $LIB_DIR\n\tSCRIPT_DIR default $SCRIPT_DIR\n\tWORK_DIR default $WORK_DIR\n\n\tExample: cli/msu.sh weather.nominal ../$DATASET_DIR Tree dist/weka-stable-3.8.7-SNAPSHOT.jar lib cli /var/tmp\n"
 
 # Análisis de la línea de comando
 if [ $# = 0 ];
@@ -29,11 +29,15 @@ fi
 
 if [ $# > 0 ];
 then
-    if [ $# = 1 ] || [ $# = 7 ];
+    if [ $# = 2 ] || [ $# = 7 ];
     then
-        if [ $# =  7 ];
+        if [ $# > 1 ]
         then
             DATASET_DIR=$2
+        fi
+
+        if [ $# = 7 ];
+        then            
             if [ $3 = "Tree" ];
             then
                 CLASS_ARGS="-K 0 -M 1.0 -V 0.001 -S 1"
@@ -70,6 +74,10 @@ then
         exit
     fi
 fi
+
+printf "Dataset dir: %s\n" $DATASET_DIR
+printf "Standard class: %s\n" $STANDARD_CLASS
+printf "MSU class: %s\n\n--\n\n" $MSU_CLASS
 
 # Ejecución de programas
 java -cp $WEKA_DIST:$LIB_DIR \
@@ -129,7 +137,7 @@ RRSE_COMP=$(echo $RRSE_COMP | sed "s/\./,/")
 
 # Creación CSV de salida
 printf "Metric;Standard Version;MSU Version;Comparison MSU-Standard\n" > $OUTPUT_CSV
-if [ $3 = "Tree" ];
+if [[ $3 = "Tree" ]];
 then
     printf "Tree size;%s;%s;%s\n" $TREE_SIZE $TREE_SIZE_MSU $(expr $TREE_SIZE_MSU - $TREE_SIZE) >> $OUTPUT_CSV
 fi
@@ -142,4 +150,4 @@ printf "Mean absolute error;%f;%f;%f\n" $MAE $MAE_MSU $MAE_COMP >> $OUTPUT_CSV
 printf "Root mean squared error;%f;%f;%f\n" $RMSE $RMSE_MSU $RMSE_COMP >> $OUTPUT_CSV
 printf "Relative absolute error;%f;%f;%f\n" $RAE $RAE_MSU $RAE_COMP >> $OUTPUT_CSV
 printf "Root relative squared error;%f;%f;%f\n" $RRSE $RRSE_MSU $RRSE_COMP >> $OUTPUT_CSV
-printf "Comparison CSV %s saved\n" $OUTPUT_CSV
+printf "\n\n--\n\nComparison CSV %s saved\n" $OUTPUT_CSV
