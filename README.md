@@ -43,10 +43,10 @@ Acciones:
 cli/msu.sh
 ```
 
-* Comparativa sobre un conjunto ejemplo de Weka
+* Ejemplo comparativa sobre un conjunto ejemplo de la instalación de Weka
 
 ```
-cli/msu.sh weather.nominal
+cli/msu.sh weather.nominal ../wekadocs/data
 ```
 
 ## Referencias
