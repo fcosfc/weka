@@ -60,10 +60,11 @@ then
                 CLASS_ARGS="-K 0 -M 1.0 -V 0.001 -S 1"
                 STANDARD_CLASS=weka.classifiers.trees.RandomTree
                 MSU_CLASS=weka.classifiers.trees.RandomTreeMSU
+                ALGORITHM=RandomTree
             else
                 if [ $3 != "Forest" ];
                 then
-                    printf "Algorithm %s not supported" $3
+                    printf "Algorithm %s not supported\n" $3
                     exit
                 fi
             fi
@@ -124,13 +125,13 @@ printf "Output %s saved\n" $J48_OUT
 # Filtrado y cálculo de resultados
 # --------------------------------
 
-read RULES_ST INST_ST SECONDS_ST CORRCLASS_PC_ST INCORRCLASS_PC_ST KS_ST MAE_ST RMSE_ST RAE_ST RRSE_ST < \
+read DISTINCT_ATTR_ST RULES_ST INST_ST SECONDS_ST CORRCLASS_PC_ST INCORRCLASS_PC_ST KS_ST MAE_ST RMSE_ST RAE_ST RRSE_ST < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $STANDARD_OUT)
 
-read RULES_MSU INST_MSU SECONDS_MSU CORRCLASS_PC_MSU INCORRCLASS_PC_MSU KS_MSU MAE_MSU RMSE_MSU RAE_MSU RRSE_MSU < \
+read DISTINCT_ATTR_MSU RULES_MSU INST_MSU SECONDS_MSU CORRCLASS_PC_MSU INCORRCLASS_PC_MSU KS_MSU MAE_MSU RMSE_MSU RAE_MSU RRSE_MSU < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $MSU_OUT)
 
-read RULES_J48 INST_J48 SECONDS_J48 CORRCLASS_PC_J48 INCORRCLASS_PC_J48 KS_ST MAE_J48 RMSE_J48 RAE_J48 RRSE_J48 < \
+read DISTINCT_ATTR_J48 RULES_J48 INST_J48 SECONDS_J48 CORRCLASS_PC_J48 INCORRCLASS_PC_J48 KS_ST MAE_J48 RMSE_J48 RAE_J48 RRSE_J48 < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $J48_OUT)
 
 # Cálculo de comparativa. Bash no soporta por defecto operaciones con números decimales
@@ -202,12 +203,16 @@ J48_RRSE_COMP=$(echo $J48_RRSE_COMP | sed "s/\./,/")
 # Creación CSV de salida
 # ----------------------
 
-printf "Metric;$ALGORITHM;$ALGORITHM MSU;Comparison MSU - Standard Version;J48;Comparison MSU - J48\n" > $OUTPUT_CSV
-if [[ $3 = "Tree" ]];
+AVERAGE_STRING="average"
+if [[ $ALGORITHM = RandomTree ]];
 then
-    printf "Tree size;%s;%s;%s;%s;%s\n" $RULES_ST $RULES_MSU $(expr $RULES_MSU - $RULES_ST) $RULES_J48 $(expr $RULES_MSU - $RULES_J48) >> $OUTPUT_CSV
+    AVERAGE_STRING=
 fi
-printf "Total Number of Instances;%s;%s;%s;%s;%s\n" $INST_ST $INST_MSU $(expr $INST_MSU - $INST_ST) $INST_J48 $(expr $INST_MSU - $INST_J48) >> $OUTPUT_CSV
+
+printf "Metric;$ALGORITHM;$ALGORITHM MSU;Comparison MSU - Standard Version;J48;Comparison MSU - J48\n" > $OUTPUT_CSV
+printf "Distinct attributes $AVERAGE_STRING;%s;%s;%s;%s;%s\n" $DISTINCT_ATTR_ST $DISTINCT_ATTR_MSU $(expr $DISTINCT_ATTR_MSU - $DISTINCT_ATTR_ST) "N/A" "N/A" >> $OUTPUT_CSV
+printf "Rules number $AVERAGE_STRING;%s;%s;%s;%s;%s\n" $RULES_ST $RULES_MSU $(expr $RULES_MSU - $RULES_ST) "N/A" "N/A" >> $OUTPUT_CSV
+printf "Total Number of Instances;%s;%s;%s;%s;%s\n" $INST_ST $INST_MSU "N/A" $INST_J48 "N/A" >> $OUTPUT_CSV
 printf "Seconds taken to build model;%f;%f;%f;%f;%f\n" $SECONDS_ST $SECONDS_MSU $ST_SECONDS_COMP $SECONDS_J48 $J48_SECONDS_COMP >> $OUTPUT_CSV
 printf "Correctly classified instances percentaje;%f;%f;%f;%f;%f\n" $CORRCLASS_PC_ST $CORRCLASS_PC_MSU $ST_CORRCLASS_PC_COMP $CORRCLASS_PC_J48 $J48_CORRCLASS_PC_COMP >> $OUTPUT_CSV
 printf "Incorrectly classified instances percentaje;%f;%f;%f;%f;%f\n" $INCORRCLASS_PC_ST $INCORRCLASS_PC_MSU $ST_INCORRCLASS_PC_COMP $INCORRCLASS_PC_J48 $J48_INCORRCLASS_PC_COMP >> $OUTPUT_CSV

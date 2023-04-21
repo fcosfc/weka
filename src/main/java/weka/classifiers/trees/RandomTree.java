@@ -45,7 +45,10 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <!-- globalinfo-start --> Class for constructing a tree that considers K
@@ -124,6 +127,7 @@ import java.util.Vector;
  * 
  * @author Eibe Frank (eibe@cs.waikato.ac.nz)
  * @author Richard Kirkby (rkirkby@cs.waikato.ac.nz)
+ * @author Paco Saucedo (fsaufer@alu.upo.es)
  * @version $Revision$
  */
 public class RandomTree extends AbstractClassifier implements OptionHandler,
@@ -176,6 +180,16 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
    * decrease/gain sum in first element and count in the second
    */
   protected double[][] m_impurityDecreasees;
+  
+  /**
+   * Number of distinct attributes on the Tree
+   */
+  protected int m_DistinctAttributes;
+  
+  /**
+   * Number of rules
+   */
+  protected int m_RulesNumber;
 
   /**
    * Returns a string describing classifier
@@ -198,6 +212,24 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
    */
   public double[][] getImpurityDecreases() {
     return m_impurityDecreasees;
+  }
+  
+  /**
+   * Get the number of distinct attributes on the tree
+   * 
+   * @return the number of distinct attributes on the tree
+   */
+  public int getDistinctAttributes() {
+    return m_DistinctAttributes;
+  }
+  
+  /**
+   * Get the number of rules
+   * 
+   * @return number of rules
+   */
+  public int getRulesNumber() {
+    return m_RulesNumber;
   }
 
   /**
@@ -802,6 +834,15 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
     if (backfit != null) {
       m_Tree.backfitData(backfit);
     }
+    
+    // Compute the number of distinct attributes on the tree
+    Set<Integer> distinctAttributes = new ConcurrentSkipListSet<>();     
+    m_Tree.computeDistinctAttributes(distinctAttributes);
+    m_DistinctAttributes = distinctAttributes.size();    
+    
+    AtomicInteger rulesNumber = new AtomicInteger(0);
+    m_Tree.computeRulesNumber(rulesNumber);
+    m_RulesNumber = rulesNumber.get();
   }    
 
   /**
@@ -844,13 +885,15 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
 
     if (m_Tree == null) {
       return "RandomTree: no model has been built yet.";
-    } else {
+    } else {            
       return "\nRandomTree\n==========\n"
         + m_Tree.toString(0)
         + "\n"
         + "\nSize of the tree : "
         + m_Tree.numNodes()
-        + (getMaxDepth() > 0 ? ("\nMax depth of tree: " + getMaxDepth()) : (""));
+        + (getMaxDepth() > 0 ? ("\nMax depth of tree: " + getMaxDepth()) : ("")
+        + "\nDistinct attributes: " + getDistinctAttributes()
+        + "\nRules number: " + getRulesNumber());
     }
   }
 
@@ -1234,6 +1277,44 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
         e.printStackTrace();
         return "RandomTree: tree can't be printed";
       }
+    }
+    
+    /**
+     * Recursively compute the number of distinct attributes on the tree
+     * 
+     * @param predecessors Set of distinct attributes
+     */
+    protected void computeDistinctAttributes(Set<Integer> predecessors) {        
+        if (m_Attribute == -1) {
+            return;
+        }
+        
+        predecessors.add(m_Attribute);
+        
+        if (m_Successors != null) {
+            for (Tree successor : m_Successors) {
+                successor.computeDistinctAttributes(predecessors);
+            }
+        }
+    }
+    
+    /**
+     * Recursively compute the number of rules on the tree
+     * 
+     * @param rulesNumber number of rules on the tree
+     */
+    protected void computeRulesNumber(AtomicInteger rulesNumber) {
+        if (m_Attribute == -1) {
+            return;
+        }
+        
+        rulesNumber.getAndIncrement();
+        
+        if (m_Successors != null) {
+            for (Tree successor : m_Successors) {
+                successor.computeRulesNumber(rulesNumber);
+            }
+        }
     }
 
     /**
@@ -2043,7 +2124,7 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
       }
 
       return num;
-    }
+    }        
   }
   
   protected Tree getTree() {

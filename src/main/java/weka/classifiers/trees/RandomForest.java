@@ -184,6 +184,7 @@ import java.util.Vector;
  * <!-- options-end -->
  * 
  * @author Richard Kirkby (rkirkby@cs.waikato.ac.nz)
+ * @author Paco Saucedo (fsaufer@alu.upo.es)
  * @version $Revision$
  */
 public class RandomForest extends Bagging {
@@ -526,8 +527,52 @@ public class RandomForest extends Bagging {
         // ignore
       }
     }
-
+    
+    buffer.append("\n\nAverage Distinct Attributes: ")
+          .append(computeAverageDistinctAttributes())
+          .append("\nAverage Rules Number: ")
+          .append(computeAverageRulesNumber())
+          .append("\n");
+   
     return buffer.toString();
+  }
+  
+  /**
+   * Compute the average of distinct attributes on the trees
+   * 
+   * @return Average of distinct attributes on the trees
+   */
+  public int computeAverageDistinctAttributes() {
+      if (m_Classifiers == null) {
+          return 0;
+      } else {
+          int sumAttributes = 0;
+          
+          for (Classifier classifier : m_Classifiers) {
+              sumAttributes += ((RandomTree) classifier).getDistinctAttributes();
+          }
+          
+          return sumAttributes / m_Classifiers.length;
+      }            
+  }
+  
+  /**
+   * Compute the average of the number of rules on the trees
+   * 
+   * @return Average of the number of rules on the trees
+   */
+  public int computeAverageRulesNumber() {
+      if (m_Classifiers == null) {
+          return 0;
+      } else {
+          int sumRulesNumber = 0;
+          
+          for (Classifier classifier : m_Classifiers) {
+              sumRulesNumber += ((RandomTree) classifier).getRulesNumber();
+          }
+          
+          return sumRulesNumber / m_Classifiers.length;
+      } 
   }
 
   /**
