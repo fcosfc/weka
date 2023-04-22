@@ -28,7 +28,7 @@ BEGIN {
   if (/Leaves number:/)
     LEAVES_NUMBER = $3 
  
-  if (/Average Branches Number:/)
+  if (/Average Leaves Number:/)
     LEAVES_NUMBER = $4 
     
   if (/Time taken to build model:/)
