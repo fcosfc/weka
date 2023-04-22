@@ -125,13 +125,13 @@ printf "Output %s saved\n" $J48_OUT
 # Filtrado y cálculo de resultados
 # --------------------------------
 
-read DISTINCT_ATTR_ST RULES_ST INST_ST SECONDS_ST CORRCLASS_PC_ST INCORRCLASS_PC_ST KS_ST MAE_ST RMSE_ST RAE_ST RRSE_ST < \
+read DISTINCT_ATTR_ST BRANCHES_ST LEAVES_ST INST_ST SECONDS_ST CORRCLASS_PC_ST INCORRCLASS_PC_ST KS_ST MAE_ST RMSE_ST RAE_ST RRSE_ST < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $STANDARD_OUT)
 
-read DISTINCT_ATTR_MSU RULES_MSU INST_MSU SECONDS_MSU CORRCLASS_PC_MSU INCORRCLASS_PC_MSU KS_MSU MAE_MSU RMSE_MSU RAE_MSU RRSE_MSU < \
+read DISTINCT_ATTR_MSU BRANCHES_MSU LEAVES_MSU INST_MSU SECONDS_MSU CORRCLASS_PC_MSU INCORRCLASS_PC_MSU KS_MSU MAE_MSU RMSE_MSU RAE_MSU RRSE_MSU < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $MSU_OUT)
 
-read DISTINCT_ATTR_J48 RULES_J48 INST_J48 SECONDS_J48 CORRCLASS_PC_J48 INCORRCLASS_PC_J48 KS_ST MAE_J48 RMSE_J48 RAE_J48 RRSE_J48 < \
+read DISTINCT_ATTR_J48 BRANCHES_J48 LEAVES_J48 INST_J48 SECONDS_J48 CORRCLASS_PC_J48 INCORRCLASS_PC_J48 KS_ST MAE_J48 RMSE_J48 RAE_J48 RRSE_J48 < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $J48_OUT)
 
 # Cálculo de comparativa. Bash no soporta por defecto operaciones con números decimales
@@ -211,7 +211,8 @@ fi
 
 printf "Metric;$ALGORITHM;$ALGORITHM MSU;Comparison MSU - Standard Version;J48;Comparison MSU - J48\n" > $OUTPUT_CSV
 printf "Distinct attributes $AVERAGE_STRING;%s;%s;%s;%s;%s\n" $DISTINCT_ATTR_ST $DISTINCT_ATTR_MSU $(expr $DISTINCT_ATTR_MSU - $DISTINCT_ATTR_ST) "N/A" "N/A" >> $OUTPUT_CSV
-printf "Rules number $AVERAGE_STRING;%s;%s;%s;%s;%s\n" $RULES_ST $RULES_MSU $(expr $RULES_MSU - $RULES_ST) "N/A" "N/A" >> $OUTPUT_CSV
+printf "Branches number $AVERAGE_STRING;%s;%s;%s;%s;%s\n" $BRANCHES_ST $BRANCHES_MSU $(expr $BRANCHES_MSU - $BRANCHES_ST) "N/A" "N/A" >> $OUTPUT_CSV
+printf "Leaves number $AVERAGE_STRING;%s;%s;%s;%s;%s\n" $LEAVES_ST $LEAVES_MSU $(expr $LEAVES_MSU - $LEAVES_ST) "N/A" "N/A" >> $OUTPUT_CSV
 printf "Total Number of Instances;%s;%s;%s;%s;%s\n" $INST_ST $INST_MSU "N/A" $INST_J48 "N/A" >> $OUTPUT_CSV
 printf "Seconds taken to build model;%f;%f;%f;%f;%f\n" $SECONDS_ST $SECONDS_MSU $ST_SECONDS_COMP $SECONDS_J48 $J48_SECONDS_COMP >> $OUTPUT_CSV
 printf "Correctly classified instances percentaje;%f;%f;%f;%f;%f\n" $CORRCLASS_PC_ST $CORRCLASS_PC_MSU $ST_CORRCLASS_PC_COMP $CORRCLASS_PC_J48 $J48_CORRCLASS_PC_COMP >> $OUTPUT_CSV

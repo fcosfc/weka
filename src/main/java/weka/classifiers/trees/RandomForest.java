@@ -528,11 +528,17 @@ public class RandomForest extends Bagging {
       }
     }
     
-    buffer.append("\n\nAverage Distinct Attributes: ")
-          .append(computeAverageDistinctAttributes())
-          .append("\nAverage Rules Number: ")
-          .append(computeAverageRulesNumber())
-          .append("\n");
+    int[] metrics = computeAverageMetrics();
+    
+    if (metrics != null) {
+        buffer.append("\n\nAverage Distinct Attributes: ")
+              .append(metrics[0])
+              .append("\nAverage Branches Number: ")
+              .append(metrics[1])
+              .append("\nAverage Leaves Number: ")
+              .append(metrics[2])
+              .append("\n");
+    }
    
     return buffer.toString();
   }
@@ -542,37 +548,24 @@ public class RandomForest extends Bagging {
    * 
    * @return Average of distinct attributes on the trees
    */
-  public int computeAverageDistinctAttributes() {
+  public int[] computeAverageMetrics() {
       if (m_Classifiers == null) {
-          return 0;
+          return null;
       } else {
-          int sumAttributes = 0;
+          int[] metrics = new int[] {0, 0, 0};
           
           for (Classifier classifier : m_Classifiers) {
-              sumAttributes += ((RandomTree) classifier).getDistinctAttributes();
+              metrics[0] += ((RandomTree) classifier).getDistinctAttributes();
+              metrics[1] += ((RandomTree) classifier).getBranchesNumber();
+              metrics[2] += ((RandomTree) classifier).getLeavesNumber();
           }
           
-          return sumAttributes / m_Classifiers.length;
+          for (int i = 0; i < metrics.length; i++) {
+              metrics[i] = metrics[i] / m_Classifiers.length;
+          }
+          
+          return metrics;
       }            
-  }
-  
-  /**
-   * Compute the average of the number of rules on the trees
-   * 
-   * @return Average of the number of rules on the trees
-   */
-  public int computeAverageRulesNumber() {
-      if (m_Classifiers == null) {
-          return 0;
-      } else {
-          int sumRulesNumber = 0;
-          
-          for (Classifier classifier : m_Classifiers) {
-              sumRulesNumber += ((RandomTree) classifier).getRulesNumber();
-          }
-          
-          return sumRulesNumber / m_Classifiers.length;
-      } 
   }
 
   /**

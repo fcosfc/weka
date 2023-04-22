@@ -182,14 +182,19 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
   protected double[][] m_impurityDecreasees;
   
   /**
-   * Number of distinct attributes on the Tree
+   * Number of distinct attributes on the tree
    */
   protected int m_DistinctAttributes;
   
   /**
-   * Number of rules
+   * Number of tree branches 
    */
-  protected int m_RulesNumber;
+  protected int m_BranchesNumber;
+  
+  /**
+   * Number of tree leaves
+   */
+  protected int m_LeavesNumber;
 
   /**
    * Returns a string describing classifier
@@ -224,12 +229,21 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
   }
   
   /**
-   * Get the number of rules
+   * Get the number of tree branches
    * 
-   * @return number of rules
+   * @return number of tree branches
    */
-  public int getRulesNumber() {
-    return m_RulesNumber;
+  public int getBranchesNumber() {
+    return m_BranchesNumber;  
+  }
+  
+  /**
+   * Get the number of tree leaves
+   * 
+   * @return number of tree leaves
+   */
+  public int getLeavesNumber() {
+    return m_LeavesNumber;
   }
 
   /**
@@ -835,14 +849,16 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
       m_Tree.backfitData(backfit);
     }
     
-    // Compute the number of distinct attributes on the tree
-    Set<Integer> distinctAttributes = new ConcurrentSkipListSet<>();     
-    m_Tree.computeDistinctAttributes(distinctAttributes);
-    m_DistinctAttributes = distinctAttributes.size();    
+    // Compute the metrics
+    Set<Integer> distinctAttributes = new ConcurrentSkipListSet<>(); 
+    AtomicInteger branchesNumber = new AtomicInteger(0);
+    AtomicInteger leavesNumber = new AtomicInteger(0);
     
-    AtomicInteger rulesNumber = new AtomicInteger(0);
-    m_Tree.computeRulesNumber(rulesNumber);
-    m_RulesNumber = rulesNumber.get();
+    m_Tree.computeMetrics(distinctAttributes, branchesNumber, leavesNumber);
+    
+    m_DistinctAttributes = distinctAttributes.size();  
+    m_BranchesNumber = branchesNumber.get();
+    m_LeavesNumber = leavesNumber.get();
   }    
 
   /**
@@ -893,7 +909,8 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
         + m_Tree.numNodes()
         + (getMaxDepth() > 0 ? ("\nMax depth of tree: " + getMaxDepth()) : ("")
         + "\nDistinct attributes: " + getDistinctAttributes()
-        + "\nRules number: " + getRulesNumber());
+        + "\nBranches number: " + getBranchesNumber()
+        + "\nLeaves number: " + getLeavesNumber());
     }
   }
 
@@ -1280,39 +1297,25 @@ public class RandomTree extends AbstractClassifier implements OptionHandler,
     }
     
     /**
-     * Recursively compute the number of distinct attributes on the tree
+     * Recursively compute the metrics
      * 
      * @param predecessors Set of distinct attributes
+     * @param branchesNumber Number of tree branches
+     * @param leavesNumber Number of tree leaves
      */
-    protected void computeDistinctAttributes(Set<Integer> predecessors) {        
+    protected void computeMetrics(Set<Integer> predecessors, AtomicInteger branchesNumber, AtomicInteger leavesNumber) {        
         if (m_Attribute == -1) {
+            leavesNumber.getAndIncrement();
+            
             return;
         }
         
         predecessors.add(m_Attribute);
+        branchesNumber.getAndIncrement();
         
         if (m_Successors != null) {
             for (Tree successor : m_Successors) {
-                successor.computeDistinctAttributes(predecessors);
-            }
-        }
-    }
-    
-    /**
-     * Recursively compute the number of rules on the tree
-     * 
-     * @param rulesNumber number of rules on the tree
-     */
-    protected void computeRulesNumber(AtomicInteger rulesNumber) {
-        if (m_Attribute == -1) {
-            return;
-        }
-        
-        rulesNumber.getAndIncrement();
-        
-        if (m_Successors != null) {
-            for (Tree successor : m_Successors) {
-                successor.computeRulesNumber(rulesNumber);
+                successor.computeMetrics(predecessors, branchesNumber, leavesNumber);
             }
         }
     }
