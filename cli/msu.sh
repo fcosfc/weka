@@ -37,7 +37,7 @@ LIB_DIR=$PWD/lib/*
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-USE="msu.sh\n\tDATASET example weather.nominal\n\tDATASET_DIR ../$DATASET_DIR\n\n\tExample: cli/msu.sh weather.nominal ../$DATASET_DIR\n\n--\n\nmsu.sh\n\tDATASET example weather.nominal\n\tDATASET_DIR ../$DATASET_DIR\n\tALGORITHM Tree or Forest, default Tree\n\tWEKA_DIST default $WEKA_DIST\n\tLIB_DIR default $LIB_DIR\n\tSCRIPT_DIR default $SCRIPT_DIR\n\tWORK_DIR default $WORK_DIR\n\n\tExample: cli/msu.sh weather.nominal ../$DATASET_DIR Tree dist/weka-stable-3.8.7-SNAPSHOT.jar lib cli /var/tmp\n"
+USE="msu.sh\n\tDATASET example weather.nominal\n\tDATASET_DIR ../$DATASET_DIR\n\n\tExample: cli/msu.sh weather.nominal ../$DATASET_DIR\n\n--\n\nmsu.sh\n\tDATASET example weather.nominal\n\tDATASET_DIR ../$DATASET_DIR\n\tALGORITHM Tree or Forest, default Forest\n\tWEKA_DIST default $WEKA_DIST\n\tLIB_DIR default $LIB_DIR\n\tSCRIPT_DIR default $SCRIPT_DIR\n\tWORK_DIR default $WORK_DIR\n\n\tExample: cli/msu.sh weather.nominal ../$DATASET_DIR Tree dist/weka-stable-3.8.7-SNAPSHOT.jar lib cli /var/tmp\n"
 
 # -------------------------------
 # Análisis de la línea de comando
@@ -145,23 +145,24 @@ printf "Output %s saved\n" $LT_OUT
 # Filtrado y cálculo de resultados
 # --------------------------------
 
-read DISTINCT_ATTR_ST BRANCHES_ST LEAVES_ST INST_ST SECONDS_ST CORRCLASS_PC_ST INCORRCLASS_PC_ST KS_ST MAE_ST RMSE_ST RAE_ST RRSE_ST < \
+read DISTINCT_ATTR_ST BRANCHES_ST LEAVES_ST INST_ST SECS_BM_ST SECS_VAL_ST CORRCLASS_PC_ST INCORRCLASS_PC_ST KS_ST MAE_ST RMSE_ST RAE_ST RRSE_ST < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $STANDARD_OUT)
 
-read DISTINCT_ATTR_MSU BRANCHES_MSU LEAVES_MSU INST_MSU SECONDS_MSU CORRCLASS_PC_MSU INCORRCLASS_PC_MSU KS_MSU MAE_MSU RMSE_MSU RAE_MSU RRSE_MSU < \
+read DISTINCT_ATTR_MSU BRANCHES_MSU LEAVES_MSU INST_MSU SECS_BM_MSU SECS_VAL_MSU CORRCLASS_PC_MSU INCORRCLASS_PC_MSU KS_MSU MAE_MSU RMSE_MSU RAE_MSU RRSE_MSU < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $MSU_OUT)
 
-read DISTINCT_ATTR_J48 BRANCHES_J48 LEAVES_J48 INST_J48 SECONDS_J48 CORRCLASS_PC_J48 INCORRCLASS_PC_J48 KS_J48 MAE_J48 RMSE_J48 RAE_J48 RRSE_J48 < \
+read DISTINCT_ATTR_J48 BRANCHES_J48 LEAVES_J48 INST_J48 SECS_BM_J48 SECS_VAL_J48 CORRCLASS_PC_J48 INCORRCLASS_PC_J48 KS_J48 MAE_J48 RMSE_J48 RAE_J48 RRSE_J48 < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $J48_OUT)
 
-read DISTINCT_ATTR_NB BRANCHES_NB LEAVES_NB INST_NB SECONDS_NB CORRCLASS_PC_NB INCORRCLASS_PC_NB KS_NB MAE_NB RMSE_NB RAE_NB RRSE_NB < \
+read DISTINCT_ATTR_NB BRANCHES_NB LEAVES_NB INST_NB SECS_BM_NB SECS_VAL_NB CORRCLASS_PC_NB INCORRCLASS_PC_NB KS_NB MAE_NB RMSE_NB RAE_NB RRSE_NB < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $NB_OUT)
 
-read DISTINCT_ATTR_LT BRANCHES_LT LEAVES_LT INST_LT SECONDS_LT CORRCLASS_PC_LT INCORRCLASS_PC_LT KS_LT MAE_LT RMSE_LT RAE_LT RRSE_LT < \
+read DISTINCT_ATTR_LT BRANCHES_LT LEAVES_LT INST_LT SECS_BM_LT SECS_VAL_LT CORRCLASS_PC_LT INCORRCLASS_PC_LT KS_LT MAE_LT RMSE_LT RAE_LT RRSE_LT < \
  <(awk -f $SCRIPT_DIR/weka_results_analyzer.awk $LT_OUT)
 
 # Cálculo de comparativa. Bash no soporta por defecto operaciones con números decimales.
-ST_SECONDS_COMP=$(echo "($SECONDS_MSU-$SECONDS_ST)"| bc -l)
+ST_SECS_BM_COMP=$(echo "($SECS_BM_MSU-$SECS_BM_ST)"| bc -l)
+ST_SECS_VAL_COMP=$(echo "($SECS_VAL_MSU-$SECS_VAL_ST)"| bc -l)
 ST_CORRCLASS_PC_COMP=$(echo "($CORRCLASS_PC_MSU - $CORRCLASS_PC_ST)"| bc -l)
 ST_INCORRCLASS_PC_COMP=$(echo "($INCORRCLASS_PC_MSU - $INCORRCLASS_PC_ST)"| bc -l)
 ST_KS_COMP=$(echo "($KS_MSU - $KS_ST)"| bc -l)
@@ -170,7 +171,8 @@ ST_RMSE_COMP=$(echo "($RMSE_MSU - $RMSE_ST)"| bc -l)
 ST_RAE_COMP=$(echo "($RAE_MSU - $RAE_ST)"| bc -l)
 ST_RRSE_COMP=$(echo "($RRSE_MSU - $RRSE_ST)"| bc -l)
 
-J48_SECONDS_COMP=$(echo "($SECONDS_MSU - $SECONDS_J48)"| bc -l)
+J48_SECS_BM_COMP=$(echo "($SECS_BM_MSU - $SECS_BM_J48)"| bc -l)
+J48_SECS_VAL_COMP=$(echo "($SECS_VAL_MSU - $SECS_VAL_J48)"| bc -l)
 J48_CORRCLASS_PC_COMP=$(echo "($CORRCLASS_PC_MSU - $CORRCLASS_PC_J48)"| bc -l)
 J48_INCORRCLASS_PC_COMP=$(echo "($INCORRCLASS_PC_MSU - $INCORRCLASS_PC_J48)"| bc -l)
 J48_KS_COMP=$(echo "($KS_MSU - $KS_J48)"| bc -l)
@@ -179,7 +181,8 @@ J48_RMSE_COMP=$(echo "($RMSE_MSU - $RMSE_J48)"| bc -l)
 J48_RAE_COMP=$(echo "($RAE_MSU - $RAE_J48)"| bc -l)
 J48_RRSE_COMP=$(echo "($RRSE_MSU - $RRSE_J48)"| bc -l)
 
-NB_SECONDS_COMP=$(echo "($SECONDS_MSU - $SECONDS_NB)"| bc -l)
+NB_SECS_BM_COMP=$(echo "($SECS_BM_MSU - $SECS_BM_NB)"| bc -l)
+NB_SECS_VAL_COMP=$(echo "($SECS_VAL_MSU - $SECS_VAL_NB)"| bc -l)
 NB_CORRCLASS_PC_COMP=$(echo "($CORRCLASS_PC_MSU - $CORRCLASS_PC_NB)"| bc -l)
 NB_INCORRCLASS_PC_COMP=$(echo "($INCORRCLASS_PC_MSU - $INCORRCLASS_PC_NB)"| bc -l)
 NB_KS_COMP=$(echo "($KS_MSU - $KS_NB)"| bc -l)
@@ -188,7 +191,8 @@ NB_RMSE_COMP=$(echo "($RMSE_MSU - $RMSE_NB)"| bc -l)
 NB_RAE_COMP=$(echo "($RAE_MSU - $RAE_NB)"| bc -l)
 NB_RRSE_COMP=$(echo "($RRSE_MSU - $RRSE_NB)"| bc -l)
 
-LT_SECONDS_COMP=$(echo "($SECONDS_MSU - $SECONDS_LT)"| bc -l)
+LT_SECS_BM_COMP=$(echo "($SECS_BM_MSU - $SECS_BM_LT)"| bc -l)
+LT_SECS_VAL_COMP=$(echo "($SECS_VAL_MSU - $SECS_VAL_LT)"| bc -l)
 LT_CORRCLASS_PC_COMP=$(echo "($CORRCLASS_PC_MSU - $CORRCLASS_PC_LT)"| bc -l)
 LT_INCORRCLASS_PC_COMP=$(echo "($INCORRCLASS_PC_MSU - $INCORRCLASS_PC_LT)"| bc -l)
 LT_KS_COMP=$(echo "($KS_MSU - $KS_LT)"| bc -l)
@@ -198,7 +202,8 @@ LT_RAE_COMP=$(echo "($RAE_MSU - $RAE_LT)"| bc -l)
 LT_RRSE_COMP=$(echo "($RRSE_MSU - $RRSE_LT)"| bc -l)
 
 # Conversión necesaria al formato decimal español, ya que el sistema operativo está en castellano y la salida de Weka no está internacionalizada
-SECONDS_ST=$(echo $SECONDS_ST | sed "s/\./,/")
+SECS_BM_ST=$(echo $SECS_BM_ST | sed "s/\./,/")
+SECS_VAL_ST=$(echo $SECS_VAL_ST | sed "s/\./,/")
 CORRCLASS_PC_ST=$(echo $CORRCLASS_PC_ST | sed "s/\./,/")
 INCORRCLASS_PC_ST=$(echo $INCORRCLASS_PC_ST | sed "s/\./,/")
 KS_ST=$(echo $KS_ST | sed "s/\./,/")
@@ -207,7 +212,8 @@ RMSE_ST=$(echo $RMSE_ST | sed "s/\./,/")
 RAE_ST=$(echo $RAE_ST | sed "s/\./,/")
 RRSE_ST=$(echo $RRSE_ST | sed "s/\./,/")
 
-SECONDS_MSU=$(echo $SECONDS_MSU | sed "s/\./,/")
+SECS_BM_MSU=$(echo $SECS_BM_MSU | sed "s/\./,/")
+SECS_VAL_MSU=$(echo $SECS_VAL_MSU | sed "s/\./,/")
 CORRCLASS_PC_MSU=$(echo $CORRCLASS_PC_MSU | sed "s/\./,/")
 INCORRCLASS_PC_MSU=$(echo $INCORRCLASS_PC_MSU | sed "s/\./,/")
 KS_MSU=$(echo $KS_MSU | sed "s/\./,/")
@@ -216,7 +222,8 @@ RMSE_MSU=$(echo $RMSE_MSU | sed "s/\./,/")
 RAE_MSU=$(echo $RAE_MSU | sed "s/\./,/")
 RRSE_MSU=$(echo $RRSE_MSU | sed "s/\./,/")
 
-SECONDS_J48=$(echo $SECONDS_J48 | sed "s/\./,/")
+SECS_BM_J48=$(echo $SECS_BM_J48 | sed "s/\./,/")
+SECS_VAL_J48=$(echo $SECS_VAL_J48 | sed "s/\./,/")
 CORRCLASS_PC_J48=$(echo $CORRCLASS_PC_J48 | sed "s/\./,/")
 INCORRCLASS_PC_J48=$(echo $INCORRCLASS_PC_J48 | sed "s/\./,/")
 KS_J48=$(echo $KS_J48 | sed "s/\./,/")
@@ -225,7 +232,8 @@ RMSE_J48=$(echo $RMSE_J48 | sed "s/\./,/")
 RAE_J48=$(echo $RAE_J48 | sed "s/\./,/")
 RRSE_J48=$(echo $RRSE_J48 | sed "s/\./,/")
 
-SECONDS_NB=$(echo $SECONDS_NB | sed "s/\./,/")
+SECS_BM_NB=$(echo $SECS_BM_NB | sed "s/\./,/")
+SECS_VAL_NB=$(echo $SECS_VAL_NB | sed "s/\./,/")
 CORRCLASS_PC_NB=$(echo $CORRCLASS_PC_NB | sed "s/\./,/")
 INCORRCLASS_PC_NB=$(echo $INCORRCLASS_PC_NB | sed "s/\./,/")
 KS_NB=$(echo $KS_NB | sed "s/\./,/")
@@ -234,7 +242,8 @@ RMSE_NB=$(echo $RMSE_NB | sed "s/\./,/")
 RAE_NB=$(echo $RAE_NB | sed "s/\./,/")
 RRSE_NB=$(echo $RRSE_NB | sed "s/\./,/")
 
-SECONDS_LT=$(echo $SECONDS_LT | sed "s/\./,/")
+SECS_BM_LT=$(echo $SECS_BM_LT | sed "s/\./,/")
+SECS_VAL_LT=$(echo $SECS_VAL_LT | sed "s/\./,/")
 CORRCLASS_PC_LT=$(echo $CORRCLASS_PC_LT | sed "s/\./,/")
 INCORRCLASS_PC_LT=$(echo $INCORRCLASS_PC_LT | sed "s/\./,/")
 KS_LT=$(echo $KS_LT | sed "s/\./,/")
@@ -243,7 +252,8 @@ RMSE_LT=$(echo $RMSE_LT | sed "s/\./,/")
 RAE_LT=$(echo $RAE_LT | sed "s/\./,/")
 RRSE_LT=$(echo $RRSE_LT | sed "s/\./,/")
 
-ST_SECONDS_COMP=$(echo $ST_SECONDS_COMP | sed "s/\./,/")
+ST_SECS_BM_COMP=$(echo $ST_SECS_BM_COMP | sed "s/\./,/")
+ST_SECS_VAL_COMP=$(echo $ST_SECS_VAL_COMP | sed "s/\./,/")
 ST_CORRCLASS_PC_COMP=$(echo $ST_CORRCLASS_PC_COMP | sed "s/\./,/")
 ST_INCORRCLASS_PC_COMP=$(echo $ST_INCORRCLASS_PC_COMP | sed "s/\./,/")
 ST_KS_COMP=$(echo $ST_KS_COMP | sed "s/\./,/")
@@ -252,7 +262,8 @@ ST_RMSE_COMP=$(echo $ST_RMSE_COMP | sed "s/\./,/")
 ST_RAE_COMP=$(echo $ST_RAE_COMP | sed "s/\./,/")
 ST_RRSE_COMP=$(echo $ST_RRSE_COMP | sed "s/\./,/")
 
-J48_SECONDS_COMP=$(echo $J48_SECONDS_COMP | sed "s/\./,/")
+J48_SECS_BM_COMP=$(echo $J48_SECS_BM_COMP | sed "s/\./,/")
+J48_SECS_VAL_COMP=$(echo $J48_SECS_VAL_COMP | sed "s/\./,/")
 J48_CORRCLASS_PC_COMP=$(echo $J48_CORRCLASS_PC_COMP | sed "s/\./,/")
 J48_INCORRCLASS_PC_COMP=$(echo $J48_INCORRCLASS_PC_COMP | sed "s/\./,/")
 J48_KS_COMP=$(echo $J48_KS_COMP | sed "s/\./,/")
@@ -261,7 +272,8 @@ J48_RMSE_COMP=$(echo $J48_RMSE_COMP | sed "s/\./,/")
 J48_RAE_COMP=$(echo $J48_RAE_COMP | sed "s/\./,/")
 J48_RRSE_COMP=$(echo $J48_RRSE_COMP | sed "s/\./,/")
 
-NB_SECONDS_COMP=$(echo $NB_SECONDS_COMP | sed "s/\./,/")
+NB_SECS_BM_COMP=$(echo $NB_SECS_BM_COMP | sed "s/\./,/")
+NB_SECS_VAL_COMP=$(echo $NB_SECS_VAL_COMP | sed "s/\./,/")
 NB_CORRCLASS_PC_COMP=$(echo $NB_CORRCLASS_PC_COMP | sed "s/\./,/")
 NB_INCORRCLASS_PC_COMP=$(echo $NB_INCORRCLASS_PC_COMP | sed "s/\./,/")
 NB_KS_COMP=$(echo $NB_KS_COMP | sed "s/\./,/")
@@ -270,7 +282,8 @@ NB_RMSE_COMP=$(echo $NB_RMSE_COMP | sed "s/\./,/")
 NB_RAE_COMP=$(echo $NB_RAE_COMP | sed "s/\./,/")
 NB_RRSE_COMP=$(echo $NB_RRSE_COMP | sed "s/\./,/")
 
-LT_SECONDS_COMP=$(echo $LT_SECONDS_COMP | sed "s/\./,/")
+LT_SECS_BM_COMP=$(echo $LT_SECS_BM_COMP | sed "s/\./,/")
+LT_SECS_VAL_COMP=$(echo $LT_SECS_VAL_COMP | sed "s/\./,/")
 LT_CORRCLASS_PC_COMP=$(echo $LT_CORRCLASS_PC_COMP | sed "s/\./,/")
 LT_INCORRCLASS_PC_COMP=$(echo $LT_INCORRCLASS_PC_COMP | sed "s/\./,/")
 LT_KS_COMP=$(echo $LT_KS_COMP | sed "s/\./,/")
@@ -294,7 +307,8 @@ printf "Distinct attributes $AVERAGE_STRING;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $DISTI
 printf "Branches number $AVERAGE_STRING;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $BRANCHES_ST $BRANCHES_MSU $(expr $BRANCHES_MSU - $BRANCHES_ST) "N/A" "N/A" "N/A" "N/A" "N/A" "N/A" >> $OUTPUT_CSV
 printf "Leaves number $AVERAGE_STRING;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $LEAVES_ST $LEAVES_MSU $(expr $LEAVES_MSU - $LEAVES_ST) "N/A" "N/A" "N/A" "N/A" "N/A" "N/A" >> $OUTPUT_CSV
 printf "Total Number of Instances;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $INST_ST $INST_MSU "N/A" $INST_J48 "N/A" $INST_NB "N/A" $INST_LT "N/A" >> $OUTPUT_CSV
-printf "Seconds taken to build model;%f;%f;%f;%f;%f;%f;%f;%f;%f\n" $SECONDS_ST $SECONDS_MSU $ST_SECONDS_COMP $SECONDS_J48 $J48_SECONDS_COMP $SECONDS_NB $NB_SECONDS_COMP $SECONDS_LT $LT_SECONDS_COMP >> $OUTPUT_CSV
+printf "Seconds taken to build model;%f;%f;%f;%f;%f;%f;%f;%f;%f\n" $SECS_BM_ST $SECS_BM_MSU $ST_SECS_BM_COMP $SECS_BM_J48 $J48_SECS_BM_COMP $SECS_BM_NB $NB_SECS_BM_COMP $SECS_BM_LT $LT_SECS_BM_COMP >> $OUTPUT_CSV
+printf "Seconds taken to perform cross-validation;%f;%f;%f;%f;%f;%f;%f;%f;%f\n" $SECS_VAL_ST $SECS_VAL_MSU $ST_SECS_VAL_COMP $SECS_VAL_J48 $J48_SECS_VAL_COMP $SECS_VAL_NB $NB_SECS_VAL_COMP $SECS_VAL_LT $LT_SECS_VAL_COMP >> $OUTPUT_CSV
 printf "Correctly classified instances percentaje;%f;%f;%f;%f;%f;%f;%f;%f;%f\n" $CORRCLASS_PC_ST $CORRCLASS_PC_MSU $ST_CORRCLASS_PC_COMP $CORRCLASS_PC_J48 $J48_CORRCLASS_PC_COMP $CORRCLASS_PC_NB $NB_CORRCLASS_PC_COMP $CORRCLASS_PC_LT $LT_CORRCLASS_PC_COMP >> $OUTPUT_CSV
 printf "Incorrectly classified instances percentaje;%f;%f;%f;%f;%f;%f;%f;%f;%f\n" $INCORRCLASS_PC_ST $INCORRCLASS_PC_MSU $ST_INCORRCLASS_PC_COMP $INCORRCLASS_PC_J48 $J48_INCORRCLASS_PC_COMP $INCORRCLASS_PC_NB $NB_INCORRCLASS_PC_COMP $INCORRCLASS_PC_LT $LT_INCORRCLASS_PC_COMP >> $OUTPUT_CSV
 printf "Kappa statistic;%f;%f;%f;%f;%f;%f;%f;%f;%f\n" $KS_ST $KS_MSU $ST_KS_COMP $KS_J48 $J48_KS_COMP $KS_NB $NB_KS_COMP $KS_LT $LT_KS_COMP >> $OUTPUT_CSV
