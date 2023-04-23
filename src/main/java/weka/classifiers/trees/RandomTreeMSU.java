@@ -302,7 +302,7 @@ public class RandomTreeMSU extends RandomTree {
                           msuClassificationDataset.getLabels(), 
                           classProbs.length)
                   : tempNumericVals[attIndex];
-
+        
         if (Utils.gr(currVal, 0)) {
           gainFound = true;
         }
@@ -317,6 +317,10 @@ public class RandomTreeMSU extends RandomTree {
           msuNewSelectedSubset[arrayIndexNewAttribute] = msuTrialSubset[arrayIndexNewAttribute];
         }
       }
+      
+      // Taking into account that it's a recurive process, prepare to free memory through GC  
+      msuClassificationDataset = null;
+      msuData = null;
 
       // Find best attribute
       m_Attribute = bestIndex;
