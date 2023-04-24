@@ -304,8 +304,8 @@ fi
 
 printf "Metric;$ALGORITHM;$ALGORITHM MSU;Comparison MSU - Standard Version;J48;Comparison MSU - J48;Naive Bayes;Comparison MSU - Naive Bayes;Logistic;Comparison MSU - Logistic\n" > $OUTPUT_CSV
 printf "Distinct attributes $AVERAGE_STRING;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $DISTINCT_ATTR_ST $DISTINCT_ATTR_MSU $(expr $DISTINCT_ATTR_MSU - $DISTINCT_ATTR_ST) "N/A" "N/A" "N/A" "N/A" "N/A" "N/A" >> $OUTPUT_CSV
-printf "Branches number $AVERAGE_STRING;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $BRANCHES_ST $BRANCHES_MSU $(expr $BRANCHES_MSU - $BRANCHES_ST) "N/A" "N/A" "N/A" "N/A" "N/A" "N/A" >> $OUTPUT_CSV
-printf "Leaves number $AVERAGE_STRING;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $LEAVES_ST $LEAVES_MSU $(expr $LEAVES_MSU - $LEAVES_ST) "N/A" "N/A" "N/A" "N/A" "N/A" "N/A" >> $OUTPUT_CSV
+printf "Branches number $AVERAGE_STRING;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $BRANCHES_ST $BRANCHES_MSU $(expr $BRANCHES_MSU - $BRANCHES_ST) $BRANCHES_J48 $(expr $BRANCHES_MSU - $BRANCHES_J48) "N/A" "N/A" "N/A" "N/A" >> $OUTPUT_CSV
+printf "Leaves number $AVERAGE_STRING;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $LEAVES_ST $LEAVES_MSU $(expr $LEAVES_MSU - $LEAVES_ST) $LEAVES_J48 $(expr $LEAVES_MSU - $LEAVES_J48) "N/A" "N/A" "N/A" "N/A" >> $OUTPUT_CSV
 printf "Total Number of Instances;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" $INST_ST $INST_MSU "N/A" $INST_J48 "N/A" $INST_NB "N/A" $INST_LT "N/A" >> $OUTPUT_CSV
 printf "Seconds taken to build model;%f;%f;%f;%f;%f;%f;%f;%f;%f\n" $SECS_BM_ST $SECS_BM_MSU $ST_SECS_BM_COMP $SECS_BM_J48 $J48_SECS_BM_COMP $SECS_BM_NB $NB_SECS_BM_COMP $SECS_BM_LT $LT_SECS_BM_COMP >> $OUTPUT_CSV
 printf "Seconds taken to perform cross-validation;%f;%f;%f;%f;%f;%f;%f;%f;%f\n" $SECS_VAL_ST $SECS_VAL_MSU $ST_SECS_VAL_COMP $SECS_VAL_J48 $J48_SECS_VAL_COMP $SECS_VAL_NB $NB_SECS_VAL_COMP $SECS_VAL_LT $LT_SECS_VAL_COMP >> $OUTPUT_CSV

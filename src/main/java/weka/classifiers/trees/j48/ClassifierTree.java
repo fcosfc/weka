@@ -438,6 +438,27 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
   }
 
   /**
+   * Returns number of branches in tree structure.
+   * 
+   * @return the number of branches
+   */
+  public int numBranches() {
+
+    int num = 1;
+    int i;
+
+    if (m_isLeaf) {
+      return 0;
+    } else {
+      for (i = 0; i < m_sons.length; i++) {
+        num = num + m_sons[i].numBranches();
+      }
+    }
+
+    return num;
+  }
+
+  /**
    * Returns number of leaves in tree structure.
    * 
    * @return the number of leaves
@@ -494,8 +515,9 @@ public class ClassifierTree implements Drawable, Serializable, RevisionHandler, 
       } else {
         dumpTree(0, text);
       }
-      text.append("\n\nNumber of Leaves  : \t" + numLeaves() + "\n");
-      text.append("\nSize of the tree : \t" + numNodes() + "\n");
+      text.append("\n\nSize of the tree : ").append(numNodes())
+          .append("\nBranches number: ").append(numBranches())
+          .append("\nLeaves number: ").append(numLeaves());
 
       return text.toString();
     } catch (Exception e) {
